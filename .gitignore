@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+/ulog_test/Library
+/ulog_test/UnityVS.ulog_test.CSharp.csproj
+/ulog_test/UnityVS.ulog_test.sln
+/ulog_test/Assets/UnityVS/Editor
