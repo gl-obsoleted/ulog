@@ -69,6 +69,33 @@ namespace ulog
             }
         }
 
+        public static void LogAssert(bool condition)
+        {
+            if (LogLevel <= LogLevel.Error)
+            {
+                LogAssert(condition, string.Empty, true);
+            }
+        }
+
+        public static void LogAssert(bool condition, string assertString)
+        {
+            if (LogLevel <= LogLevel.Error)
+            {
+                LogAssert(condition, assertString, false);
+            }
+        }
+
+        public static void LogAssert(bool condition, string assertString, bool pauseOnFail)
+        {
+            if (!condition && LogLevel <= LogLevel.Error)
+            {
+                Debug.LogError("assert failed! " + assertString);
+
+                if (pauseOnFail)
+                    Debug.Break();
+            }
+        }
+
         #region log time
         private static float time = 0;
         public static void LogDeltaTime(string label)
