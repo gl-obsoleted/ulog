@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ulog
+namespace GameCommon
 {
     public enum LogLevel
     {
@@ -16,9 +13,9 @@ namespace ulog
 
     public static class Log
     {
-        private static LogLevel LogLevel = LogLevel.Info;
+        public static LogLevel LogLevel = LogLevel.Info;
 
-        public static void LogInfo(string msg, params object[] args)
+        public static void Info(string msg, params object[] args)
         {
             if (LogLevel <= LogLevel.Info)
             {
@@ -30,7 +27,7 @@ namespace ulog
                 }
             }
         }
-        public static void LogTODO(string msg, params object[] args)
+        public static void TODO(string msg, params object[] args)
         {
             if (LogLevel <= LogLevel.Info)
             {
@@ -41,7 +38,7 @@ namespace ulog
                     Debug.Log(string.Format(msg, args));
             }
         }
-        public static void LogWarning(string msg, params object[] args)
+        public static void Warning(string msg, params object[] args)
         {
             if (LogLevel <= LogLevel.Warning)
             {
@@ -51,7 +48,7 @@ namespace ulog
                     Debug.LogWarning(string.Format(msg, args));
             }
         }
-        public static void LogError(string msg, params object[] args)
+        public static void Error(string msg, params object[] args)
         {
             if (LogLevel <= LogLevel.Error)
             {
@@ -61,7 +58,7 @@ namespace ulog
                     Debug.LogError(string.Format(msg, args));
             }
         }
-        public static void LogException(Exception ex)
+        public static void Exception(Exception ex)
         {
             if (LogLevel <= LogLevel.Error)
             {
@@ -69,23 +66,23 @@ namespace ulog
             }
         }
 
-        public static void LogAssert(bool condition)
+        public static void Assert(bool condition)
         {
             if (LogLevel <= LogLevel.Error)
             {
-                LogAssert(condition, string.Empty, true);
+                Assert(condition, string.Empty, true);
             }
         }
 
-        public static void LogAssert(bool condition, string assertString)
+        public static void Assert(bool condition, string assertString)
         {
             if (LogLevel <= LogLevel.Error)
             {
-                LogAssert(condition, assertString, false);
+                Assert(condition, assertString, false);
             }
         }
 
-        public static void LogAssert(bool condition, string assertString, bool pauseOnFail)
+        public static void Assert(bool condition, string assertString, bool pauseOnFail)
         {
             if (!condition && LogLevel <= LogLevel.Error)
             {
@@ -98,13 +95,13 @@ namespace ulog
 
         #region log time
         private static float time = 0;
-        public static void LogDeltaTime(string label)
+        public static void DeltaTime(string label)
         {
             if (time == 0)
             {
                 time = Time.time;
             }
-            LogInfo(label + ":" + (Time.time - time));
+            Info(label + ":" + (Time.time - time));
             time = Time.time;
         }
         #endregion
