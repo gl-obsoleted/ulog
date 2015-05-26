@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,28 @@ using UnityEngine;
 
 namespace GameCommon
 {
+    public class LogEventArgs : EventArgs
+    {
+        public LogEventArgs(int seqID, LogType type, string content, float time)
+        {
+            SeqID = seqID;
+            LogType = type;
+            Content = content;
+            Time = time;
+        }
+
+        public int SeqID = 0;
+        public LogType LogType;
+        public string Content = "";
+        public float Time = 0.0f;
+    }
+
+    public delegate void LogTargetHandler(object sender, LogEventArgs args);
+
     public class LogService : IDisposable
     {
+        public event LogTargetHandler LogTargets;
+
         public LogService(bool logIntoFile)
         {
             RegisterCallback();
@@ -99,6 +120,17 @@ namespace GameCommon
                 if (_logWriter != null)
                 {
                     _logWriter.WriteLine("{0:0.00} {1}: {2}", Time.realtimeSinceStartup, type, condition);
+                }
+
+                foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
+                {
+                    ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
+                    LogEventArgs args = new LogEventArgs(_seqID, type, condition, Time.realtimeSinceStartup);
+
+                    if (SyncInvoke != null && SyncInvoke.InvokeRequired)
+                        SyncInvoke.Invoke(Caster, new object[] { this, args });
+                    else
+                        Caster(this, args);
                 }
             }
             catch (System.Exception ex)
