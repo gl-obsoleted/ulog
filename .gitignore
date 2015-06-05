@@ -198,3 +198,8 @@ FakesAssemblies/
 /ulog_test/UnityVS.ulog_test.CSharp.csproj
 /ulog_test/UnityVS.ulog_test.sln
 /ulog_test/Assets/UnityVS/Editor
+/ulog_test/Temp
+/ulog_test/Assembly-CSharp-vs.csproj
+/ulog_test/Assembly-CSharp.csproj
+/ulog_test/ulog_test-csharp.sln
+/ulog_test/ulog_test.sln

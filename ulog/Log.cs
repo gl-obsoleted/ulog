@@ -92,14 +92,10 @@ public static class Log
     }
 
     #region log time
-    private static float time = 0;
+    private static float time = Time.time;
     public static void DeltaTime(string label)
     {
-        if (time == 0)
-        {
-            time = Time.time;
-        }
-        Info(label + ":" + (Time.time - time));
+        Info(label + ":" + (Time.time - time).ToString());
         time = Time.time;
     }
     #endregion

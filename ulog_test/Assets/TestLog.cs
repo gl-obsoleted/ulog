@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using GameCommon;
 using System;
 
 public class TestLog : MonoBehaviour {
@@ -23,10 +22,23 @@ public class TestLog : MonoBehaviour {
             Log.Error("test error.");
             Log.Assert(false, "test assert");
             Log.Exception(new Exception());
+
+            StartCoroutine(RunTimedLogging());
         }
 	}
-	
-	// Update is called once per frame
+
+    IEnumerator RunTimedLogging()
+    {
+        Log.DeltaTime("init");
+        yield return new WaitForSeconds(0.2f);
+        Log.DeltaTime("sleep for 0.2s");
+        yield return new WaitForSeconds(0.3f);
+        Log.DeltaTime("sleep for 0.3s");
+        yield return new WaitForSeconds(0.4f);
+        Log.DeltaTime("sleep for 0.4s");
+    }
+
+    // Update is called once per frame
 	void Update () {
 	
 	}
