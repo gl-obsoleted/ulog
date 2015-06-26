@@ -48,6 +48,7 @@ public class LogService : IDisposable
                 _logPath = logPath;
 
                 Log.Info("'Log Into File' enabled, file opened successfully. ('{0}')", _logPath);
+                LastLogFile = _logPath;
             }
             catch (System.Exception ex)
             {
@@ -58,6 +59,7 @@ public class LogService : IDisposable
         else
         {
             Log.Info("'Log Into File' disabled.");
+            LastLogFile = "";
         }
     }
 
@@ -149,4 +151,6 @@ public class LogService : IDisposable
 
     private bool _disposed = false;
     private bool _isWriting = false;
+
+    public static string LastLogFile { get; set; }
 }
