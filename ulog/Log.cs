@@ -3,10 +3,10 @@ using System;
 
 public enum LogLevel
 {
-    Info = 0,
-    Warning,
-    Error,
     NoLog,
+    Error,
+    Warning,
+    Info,
 }
 
 public static class Log
