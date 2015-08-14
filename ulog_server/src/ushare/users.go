@@ -46,6 +46,8 @@ func NewUser(info []string, salt []byte) (string, error) {
 		}
 	}
 
+	core.LogDebug("New user %v.", us.Ticket)
+	core.LogDebug("  %v\n", us)
 	GActiveUsers[us.Ticket] = us
 	return us.Ticket, nil
 }

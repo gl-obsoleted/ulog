@@ -1,6 +1,7 @@
 package core
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -29,6 +30,8 @@ var GLogWriter LogWriter
 var GlobalErrorCount int = 0
 var GlobalFatalErrorCount int = 0
 
+var GLogDebug = flag.Bool("d", false, "turn on debug output")
+
 func InitLogging() error {
 	t := time.Now()
 	logging_dir := fmt.Sprintf("temp/%02d-%02d-%02d/", t.Year(), t.Month(), t.Day())
@@ -50,7 +53,8 @@ func InitLogging() error {
 	log.SetFlags(log.Ldate | log.Ldate | log.Lshortfile)
 	log.SetOutput(GLogWriter)
 	log.Println("--- logging system initialized ---")
-	log.Println("  LogFile: " + GLogWriter.LogFile.Name())
+	log.Println("  Log File: ", GLogWriter.LogFile.Name())
+	log.Println("  Debug Output: ", *GLogDebug)
 
 	return nil
 }
@@ -61,6 +65,14 @@ func DestroyLogging() {
 }
 
 // =========== Public Functions ===========
+
+func LogDebug(format string, args ...interface{}) {
+	if !(*GLogDebug) {
+		return
+	}
+
+	log.Printf("{debug} "+format, args)
+}
 
 func LogError(title string, err error) {
 	if err == nil {

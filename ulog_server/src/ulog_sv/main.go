@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 	"userve"
 	"ushare"
@@ -9,8 +10,11 @@ import (
 )
 
 func main() {
+	flag.Parse()
+
 	err := ushare.InitEnv()
 	defer ushare.DestroyEnv()
+
 	if err != nil {
 		core.LogFatalError("Application initializing failed!", err)
 		return
