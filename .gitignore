@@ -194,12 +194,10 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
-/ulog_test/Library
-/ulog_test/UnityVS.ulog_test.CSharp.csproj
-/ulog_test/UnityVS.ulog_test.sln
-/ulog_test/Assets/UnityVS/Editor
-/ulog_test/Temp
-/ulog_test/Assembly-CSharp-vs.csproj
-/ulog_test/Assembly-CSharp.csproj
-/ulog_test/ulog_test-csharp.sln
-/ulog_test/ulog_test.sln
+/ulog/ulog_test/Library
+/ulog/ulog_test/UnityVS.*.csproj
+/ulog/ulog_test/UnityVS.*.sln
+/ulog/ulog_test/Assets/UnityVS/Editor
+/ulog/ulog_test/Temp
+/ulog/ulog_test/ulog_test-csharp.sln
+/ulog/ulog_test/ulog_test.sln
