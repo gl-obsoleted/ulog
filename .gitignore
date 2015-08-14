@@ -204,4 +204,4 @@ FakesAssemblies/
 /ulog_server_db/db_dev_test
 /ulog_server/pkg
 /ulog_server/src/gopkg.in/mgo.v2
-/ulog_server/src/*.sublime-workspace
+*.sublime-workspace
