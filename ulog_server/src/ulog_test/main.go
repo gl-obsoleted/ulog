@@ -2,52 +2,53 @@ package main
 
 import (
 	"encoding/base64"
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"ushare/core"
 )
 
-func test_get() {
-	resp, err := http.Get("http://localhost:13080/")
-	if err != nil {
-		core.LogFatalError("Server not running!", err)
-		return
-	}
-	defer resp.Body.Close()
+var GLogServerAddr = flag.String("addr", "", "log server address")
+var GLogServerPort = flag.Int("port", 13080, "log server port")
 
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		core.LogFatalError("response is not readable!", err)
-		return
-	}
-
-	log.Printf("  %s\n", content)
-}
-
-func test_post() {
-	var user_info string
-	user_info = "2|8|3|4"
+func query_ticket(serverName string, userName string) (string, error) {
+	addr_query := fmt.Sprintf("http://%s:%v/query_ticket", *GLogServerAddr, *GLogServerPort)
+	user_info := fmt.Sprintf("%s|%s|3|4", serverName, userName)
 	encoded := base64.StdEncoding.EncodeToString([]byte(user_info))
-
-	resp, err := http.PostForm("http://localhost:13080/query_ticket", url.Values{"user_info": {encoded}})
+	resp, err := http.PostForm(addr_query, url.Values{"user_info": {encoded}})
 	if err != nil {
-		core.LogFatalError("PostForm failed!", err)
-		return
+		core.LogErrorln("PostForm failed!", err)
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		core.LogFatalError("response is not readable!", err)
-		return
+		core.LogErrorln("response is not readable!", err)
+		return "", err
 	}
 
-	log.Printf("  %s\n", resp.Status)
-	log.Printf("  %s\n", content)
+	log.Printf("query_ticket(): %s\n", resp.Status)
+	return string(content), nil
 }
 
 func main() {
-	test_post()
+	flag.Parse()
+
+	if *GLogServerAddr == "" {
+		core.LogErrorln("Log Server not specified! (-addr)")
+		os.Exit(-1)
+	}
+
+	ticket, err := query_ticket("测试服务器名", "测试账号名")
+	if err != nil {
+		core.LogErrorln("Query ticket failed!", err)
+		os.Exit(-1)
+	}
+
+	log.Printf("ticket: %s\n", ticket)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -71,7 +72,17 @@ func LogDebug(format string, args ...interface{}) {
 		return
 	}
 
-	log.Printf("{debug} "+format, args)
+	log.Printf("{debug} "+format, args...)
+}
+
+func LogErrorf(format string, args ...interface{}) {
+	GlobalErrorCount++
+	log.Printf("{error(#"+strconv.Itoa(GlobalErrorCount)+")} "+format, args...)
+}
+
+func LogErrorln(args ...interface{}) {
+	GlobalErrorCount++
+	log.Printf("{error(#%v)} %s\n", GlobalErrorCount, fmt.Sprint(args...))
 }
 
 func LogError(title string, err error) {
@@ -81,9 +92,7 @@ func LogError(title string, err error) {
 	}
 
 	GlobalErrorCount++
-	log.Printf("\n\n=== Error Occurred (#%v) ===\n\n", GlobalErrorCount)
-	log.Printf("  %v\n", title)
-	log.Printf("  %v\n", err.Error())
+	log.Printf("{error(#%v)} %s - (%s)\n", GlobalErrorCount, title, err.Error())
 }
 
 func LogFatalError(title string, err error) {
@@ -93,7 +102,5 @@ func LogFatalError(title string, err error) {
 	}
 
 	GlobalFatalErrorCount++
-	log.Printf("\n\n=== Fatal Error Occurred (#%v) ===\n\n", GlobalFatalErrorCount)
-	log.Printf("  %v\n", title)
-	log.Printf("  %v\n", err.Error())
+	log.Printf("{fatal(#%v)} %s - (%s)\n", GlobalFatalErrorCount, title, err.Error())
 }
