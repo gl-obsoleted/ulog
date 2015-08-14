@@ -1,0 +1,10 @@
+{
+	"web_dir": "/web",
+	"ugc_dir": "/ugc",
+	"db": 
+	{
+		"addr": "localhost",
+		"name": "sshot_img"
+	},
+	"listen_port": "13080"
+}
