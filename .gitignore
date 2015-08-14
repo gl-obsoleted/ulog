@@ -201,7 +201,7 @@ FakesAssemblies/
 /ulog/ulog_test/Temp
 /ulog/ulog_test/ulog_test-csharp.sln
 /ulog/ulog_test/ulog_test.sln
-/ulog_server/server_db/db_dev_test
-/ulog_server/server/pkg
-/ulog_server/server/src/gopkg.in/mgo.v2
-/ulog_server/server/src/*.sublime-workspace
+/ulog_server_db/db_dev_test
+/ulog_server/pkg
+/ulog_server/src/gopkg.in/mgo.v2
+/ulog_server/src/*.sublime-workspace
