@@ -87,6 +87,8 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("File uploaded. (%s)\n", destPath)
+
 	// 记录到数据库
 	if err := ushare.DBLogNewUserEvent(ticket, ushare.EVT_ImageUploaded, ushare.EVT_OK, "file: "+dst.Name()); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

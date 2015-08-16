@@ -56,5 +56,7 @@ func ValidateFiles(w http.ResponseWriter, r *http.Request) {
 		// w.Write([]byte(file_info[0]))
 	}
 
-	w.Write([]byte(strings.Join(neededFiles, "|")))
+	if len(neededFiles) > 0 {
+		w.Write([]byte(strings.Join(neededFiles, "|")))
+	}
 }
