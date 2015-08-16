@@ -47,13 +47,13 @@ func QueryTicket(w http.ResponseWriter, r *http.Request) {
 
 	decoded, err := base64.StdEncoding.DecodeString(base)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	strArray := strings.Split(string(decoded), "|")
 	if len(strArray) != 4 {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -63,7 +63,7 @@ func QueryTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 流程调试
+	// -- 流程调试 --
 	// log.Println("base: ", base)
 	// log.Println("decoded: ", string(decoded))
 	// log.Println("ticket: ", ticket)
@@ -77,4 +77,6 @@ func QueryTicket(w http.ResponseWriter, r *http.Request) {
 	// http response (目前暂时不使用 json)
 	w.Write([]byte(ticket))
 	//WriteJsonResponse(w, us.Ticket)
+
+	log.Println("Ticket allocated: ", ticket)
 }

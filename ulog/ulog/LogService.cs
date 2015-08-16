@@ -41,7 +41,7 @@ public class LogService : IDisposable
                 string logDir = SysUtil.CombinePaths(Application.persistentDataPath, "log", SysUtil.FormatDateAsFileNameString(dt));
                 Directory.CreateDirectory(logDir);
 
-                string logPath = Path.Combine(logDir, SysUtil.FormatTimeAsFileNameString(dt) + ".txt");
+                string logPath = Path.Combine(logDir, SysUtil.FormatDateAsFileNameString(dt) + '_' + SysUtil.FormatTimeAsFileNameString(dt) + ".txt");
 
                 _logWriter = new FileInfo(logPath).CreateText();
                 _logWriter.AutoFlush = true;
@@ -73,7 +73,7 @@ public class LogService : IDisposable
         }
 
 #if UNITY_5_0
-        Application.logMessageReceivedThreaded -= Logging.OnLogReceived;
+        Application.logMessageReceivedThreaded -= OnLogReceived;
 #endif
 
         _disposed = true;
@@ -82,7 +82,7 @@ public class LogService : IDisposable
     private void RegisterCallback()
     {
 #if UNITY_5_0
-        Application.logMessageReceivedThreaded += Logging.OnLogReceived;
+        Application.logMessageReceivedThreaded += OnLogReceived;
 #else
         Application.RegisterLogCallbackThreaded(OnLogReceived);
 #endif
