@@ -5,36 +5,14 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
-	"ushare"
 	"ushare/core"
 )
-
-var GLogServerAddr = flag.String("addr", "", "log server address")
-var GLogServerPort = flag.Int("port", 13080, "log server port")
-
-var GTestLogDir = flag.String("testlogdir", `..\..\test_data\testlogs`, "the directory of test logs")
-
-type LogFileInfo struct {
-	Path   string
-	Digest string
-}
-
-func build_url(verb string) string {
-	return fmt.Sprintf("http://%s:%v/%s", *GLogServerAddr, *GLogServerPort, verb)
-}
-
-func build_url_t(verb string, ticket string) string {
-	return build_url(verb) + "?ticket=" + ticket
-}
 
 func query_ticket(serverName string, userName string) (string, error) {
 	user_info := fmt.Sprintf("%s|%s|3|4", serverName, userName)
@@ -56,23 +34,14 @@ func query_ticket(serverName string, userName string) (string, error) {
 	return string(content), nil
 }
 
-func find_logs() []LogFileInfo {
-	ret := []LogFileInfo{}
-	filepath.Walk(*GTestLogDir, func(path string, info os.FileInfo, err error) error {
-		if info.Mode().IsRegular() {
-			var file LogFileInfo
-			file.Path = path
-			if digest, err := ushare.GetDataFileInfo(path); err == nil {
-				file.Digest = digest
-				ret = append(ret, file)
-			}
-		}
-		return nil
-	})
-	return ret
-}
+func validate_logs(ticket string) ([]string, error) {
+	// find local logs
+	logs := find_logs()
+	log.Printf("files: \n")
+	for i := range logs {
+		log.Println(logs[i])
+	}
 
-func validate_logs(ticket string, logs []LogFileInfo) ([]string, error) {
 	url_values := url.Values{}
 	for i := range logs {
 		url_values.Set(logs[i].Path, logs[i].Digest)
@@ -99,44 +68,15 @@ func validate_logs(ticket string, logs []LogFileInfo) ([]string, error) {
 	return strings.Split(string(content), "|"), nil
 }
 
-func newfileUploadRequest(uri, paramName, path string) (*http.Request, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
-	if err != nil {
-		return nil, err
-	}
-	_, err = io.Copy(part, file)
-
-	err = writer.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", uri, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	return req, nil
-}
-
 func upload_logs(ticket string, logs []string) error {
-	for _, logfile := range logs {
+	for i, logfile := range logs {
 		if len(logfile) == 0 {
 			continue
 		}
 
-		log.Printf("uploading %s...\n", logfile)
+		log.Printf("uploading (%d/%d) %s...\n", i+1, len(logs), logfile)
 
-		request, err := newfileUploadRequest(build_url_t("upload_resource", ticket), "file_list", logfile)
+		request, err := make_upload_request(build_url_t("upload_resource", ticket), "file_list", logfile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -174,31 +114,26 @@ func main() {
 	}
 	log.Printf("ticket: %s\n", ticket)
 
-	// find local logs
-	files := find_logs()
-	log.Printf("files: \n")
-	for i := range files {
-		log.Println(files[i])
-	}
-
 	// validate logs
-	validated, err := validate_logs(ticket, files)
+	validated, err := validate_logs(ticket)
 	if err != nil {
 		core.LogErrorln("validate_logs() failed!", err)
 		os.Exit(-1)
 	}
+	if len(validated) == 0 {
+		log.Printf("No file needs to be uploaded.\n")
+		os.Exit(0)
+	}
 
-	if len(validated) > 0 {
-		log.Printf("validated files (%d): \n", len(validated))
-		for i := range validated {
-			log.Println(validated[i])
-		}
+	log.Printf("validated files (%d): \n", len(validated))
+	for i := range validated {
+		log.Println(validated[i])
+	}
 
-		// upload logs
-		err = upload_logs(ticket, validated)
-		if err != nil {
-			core.LogErrorln("upload_logs() failed!", err)
-			os.Exit(-1)
-		}
+	// upload logs
+	err = upload_logs(ticket, validated)
+	if err != nil {
+		core.LogErrorln("upload_logs() failed!", err)
+		os.Exit(-1)
 	}
 }
