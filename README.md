@@ -9,7 +9,7 @@
 
 2. Setup GOPATH
   - Open `GoSubline.subline-settings` (from menu __Package Settings | GoSublime | Settings - User__) 
-  - Use the sample below and __change the actual GOPATH to your local path__ 
+  - Use the sample below and __change the actual GOPATH to your local path__  
     ``` json
     {
     "env": { "GOPATH": "D:/<local_ulog_dir>/ulog_server/" },    
