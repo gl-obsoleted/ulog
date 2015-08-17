@@ -8,7 +8,7 @@
   - GoSublime (inside Package Control)
 
 2. Setup GOPATH
-  - Open 'GoSubline.subline-settings' (from menu __Package Settings | GoSublime | Settings - User__) 
+  - Open `GoSubline.subline-settings` (from menu __Package Settings | GoSublime | Settings - User__) 
   - Use the sample below and __change the actual GOPATH to your local path__ 
     ``` json
     {
@@ -17,5 +17,7 @@
     ```
 
 3. open `/ulog_server/src/ulog_sv/main.go` 
+  - Select `Tools | Build Systems | GoSublime`
+  - run `Ctrl - B` to open the build console
   - run `go get gopkg.in/mgo.v2`
   - run `go install`
