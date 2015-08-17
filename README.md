@@ -11,11 +11,11 @@
   - Open 'GoSubline.subline-settings' (from menu __Package Settings | GoSublime | Settings - User__) 
   - Use the sample below and __change the actual GOPATH to your local path__ 
   
-  ``` json
-  {
-  "env": { "GOPATH": "D:/<local_ulog_dir>/ulog_server/" },    
-  }
-  ```
+    ``` json
+    {
+    "env": { "GOPATH": "D:/<local_ulog_dir>/ulog_server/" },    
+    }
+    ```
 
 3. run `go get gopkg.in/mgo.v2`
 
