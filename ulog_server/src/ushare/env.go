@@ -35,6 +35,10 @@ func InitEnv() error {
 	log.Println("GConfig initialized.")
 
 	web_dir, _ := GConfig.LocateString("web_dir")
+	core.LogDebug("web_dir: %s", web_dir)
+	if wd, err := os.Getwd(); err == nil {
+		core.LogDebug("working_dir: %s", wd)
+	}
 	if err := validateWebFolder(web_dir); err != nil {
 		return err
 	}
