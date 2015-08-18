@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"ushare/core"
 )
@@ -80,7 +81,12 @@ func initWorkingDirectory() error {
 }
 
 func validateWebFolder(web string) error {
-	web_dir, err := filepath.Abs(web)
+	wd, err := os.Getwd()
+	if err != nil {
+		return core.NewStdErr(core.ERR_EnvFatal, err.Error())
+	}
+
+	web_dir, err := filepath.Abs(path.Join(wd, web))
 	if err != nil {
 		return core.NewStdErr(core.ERR_EnvFatal, err.Error())
 	}

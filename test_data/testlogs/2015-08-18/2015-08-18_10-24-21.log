@@ -1,0 +1,12 @@
+2015/08/18 logging.go:56: --- logging system initialized ---
+2015/08/18 logging.go:57:   Log File:  temp/2015-08-18/2015-08-18-10-24-21.log
+2015/08/18 logging.go:58:   Debug Output:  false
+2015/08/18 env.go:30: init GConfig(config.json)...
+2015/08/18 env.go:35: GConfig initialized.
+2015/08/18 env.go:38: web_dir: /web
+2015/08/18 env.go:42: web directory validated:  /web
+2015/08/18 env.go:46: connecting to db(addr:localhost, name:sshot_img)...
+2015/08/18 env.go:50: database connected.
+2015/08/18 env.go:52: initialization Done.
+2015/08/18 ticket.go:26: Ticket system initialized.
+2015/08/18 ticket.go:27: GTicketSalt: 765af0fb2c86b47ed3e17284ac37e3d17c5a6202a946789cefec05239e873085f2d1a8f8e0e49a20bef8f8ee69d112c993f3500f7e73c0ae1c8cfbf1cb9bbee92aef0a3867798ff599085dc3bfd142453e526bf8b2a826c3e864ee63a2df134b0a7a8800c372fb9b0eb6df85e1cf72ea50bdd1954d7881e20cf89d198826a09d
