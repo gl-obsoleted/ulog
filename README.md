@@ -1,8 +1,9 @@
 # ulog
 
-## ulog build server steps
+## build steps
 
 1. Install environments below
+  - Go (1.4 at least)
   - Sublime 3
   - Sublime Package Control
   - GoSublime (inside Package Control)
