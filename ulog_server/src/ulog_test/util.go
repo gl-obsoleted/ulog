@@ -8,8 +8,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"ushare"
+	"ushare/core"
 )
 
 var GLogServerAddr = flag.String("addr", "", "log server address")
@@ -31,7 +33,20 @@ func build_url_t(verb string, ticket string) string {
 
 func find_logs() []LogFileInfo {
 	ret := []LogFileInfo{}
-	filepath.Walk(*GTestLogDir, func(path string, info os.FileInfo, err error) error {
+
+	wd, err := os.Getwd()
+	if err != nil {
+		core.LogError("os.Getwd() failed.", err)
+		return nil
+	}
+
+	test_dir, err := filepath.Abs(path.Clean(path.Join(wd, *GTestLogDir)))
+	if err != nil {
+		core.LogError("os.Getwd() failed.", err)
+		return nil
+	}
+
+	filepath.Walk(test_dir, func(path string, info os.FileInfo, err error) error {
 		if info.Mode().IsRegular() {
 			var file LogFileInfo
 			file.Path = path
