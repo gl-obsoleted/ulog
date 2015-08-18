@@ -47,7 +47,7 @@ public class Util
                     byte[] digest = md5.ComputeHash(stream);
                     for (int i = 0; i < digest.Length; i++)
                     {
-                        b.AppendFormat("{0:X}", digest[i]);
+                        b.AppendFormat("{0:x}", digest[i]);
                     }
                 }
             }
