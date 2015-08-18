@@ -13,47 +13,65 @@ public static class Log
 {
     public static LogLevel LogLevel = LogLevel.Info;
 
-    public static void Info(string msg, params object[] args)
+    public static void Info(object msg, params object[] args)
     {
         if (LogLevel <= LogLevel.Info)
         {
-            if (args.Length == 0)
+            string fmt = msg as string;
+            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+            {
                 Debug.Log(msg);
+            }
             else
             {
-                Debug.Log(string.Format(msg, args));
+                Debug.Log(string.Format(fmt, args));
             }
         }
     }
-    public static void TODO(string msg, params object[] args)
+    public static void TODO(object msg, params object[] args)
     {
         if (LogLevel <= LogLevel.Info)
         {
+            string fmt = msg as string;
             msg = string.Format("TODO:{0}", msg);
-            if (args.Length == 0)
+            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+            {
                 Debug.Log(msg);
+            }
             else
-                Debug.Log(string.Format(msg, args));
+            {
+                Debug.Log(string.Format(fmt, args));
+            }
         }
     }
-    public static void Warning(string msg, params object[] args)
+    public static void Warning(object msg, params object[] args)
     {
         if (LogLevel <= LogLevel.Warning)
         {
-            if (args.Length == 0)
+            string fmt = msg as string;
+            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+            {
                 Debug.LogWarning(msg);
+            }
             else
-                Debug.LogWarning(string.Format(msg, args));
+            {
+                Debug.LogWarning(string.Format(fmt, args));
+            }
         }
     }
-    public static void Error(string msg, params object[] args)
+    public static void Error(object msg, params object[] args)
     {
         if (LogLevel <= LogLevel.Error)
         {
-            if (args.Length == 0)
+            string fmt = msg as string;
+            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+            {
                 Debug.LogError(msg);
+            }
             else
-                Debug.LogError(string.Format(msg, args));
+            {
+                Debug.LogError(string.Format(fmt, args));
+            }
         }
     }
     public static void Exception(Exception ex)
