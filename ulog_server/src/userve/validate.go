@@ -42,7 +42,10 @@ func ValidateFiles(w http.ResponseWriter, r *http.Request) {
 				if sv_file_info == file_info[0] {
 					log.Printf("file already exists on server: %v, %s\n", sv_file_path, sv_file_info)
 					continue // this file has been uploaded to server correctly
+				} else {
+					log.Printf("fingerprint mismatched: \n  %s\n  %s\n", sv_file_info, file_info[0])
 				}
+
 			} else {
 				log.Printf("error: %v\n", err)
 			}
