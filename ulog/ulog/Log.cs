@@ -15,7 +15,7 @@ public static class Log
 
     public static void Info(object msg, params object[] args)
     {
-        if (LogLevel <= LogLevel.Info)
+        if (LogLevel >= LogLevel.Info)
         {
             string fmt = msg as string;
             if (args.Length == 0 || string.IsNullOrEmpty(fmt))
@@ -30,7 +30,7 @@ public static class Log
     }
     public static void TODO(object msg, params object[] args)
     {
-        if (LogLevel <= LogLevel.Info)
+        if (LogLevel >= LogLevel.Info)
         {
             string fmt = msg as string;
             msg = string.Format("TODO:{0}", msg);
@@ -46,7 +46,7 @@ public static class Log
     }
     public static void Warning(object msg, params object[] args)
     {
-        if (LogLevel <= LogLevel.Warning)
+        if (LogLevel >= LogLevel.Warning)
         {
             string fmt = msg as string;
             if (args.Length == 0 || string.IsNullOrEmpty(fmt))
@@ -61,7 +61,7 @@ public static class Log
     }
     public static void Error(object msg, params object[] args)
     {
-        if (LogLevel <= LogLevel.Error)
+        if (LogLevel >= LogLevel.Error)
         {
             string fmt = msg as string;
             if (args.Length == 0 || string.IsNullOrEmpty(fmt))
@@ -76,7 +76,7 @@ public static class Log
     }
     public static void Exception(Exception ex)
     {
-        if (LogLevel <= LogLevel.Error)
+        if (LogLevel >= LogLevel.Error)
         {
             Debug.LogException(ex);
         }
@@ -84,7 +84,7 @@ public static class Log
 
     public static void Assert(bool condition)
     {
-        if (LogLevel <= LogLevel.Error)
+        if (LogLevel >= LogLevel.Error)
         {
             Assert(condition, string.Empty, true);
         }
