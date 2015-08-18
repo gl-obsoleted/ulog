@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"ushare/core"
 )
@@ -35,10 +36,6 @@ func InitEnv() error {
 	log.Println("GConfig initialized.")
 
 	web_dir, _ := GConfig.LocateString("web_dir")
-	core.LogDebug("web_dir: %s", web_dir)
-	if wd, err := os.Getwd(); err == nil {
-		core.LogDebug("working_dir: %s", wd)
-	}
 	if err := validateWebFolder(web_dir); err != nil {
 		return err
 	}
@@ -84,7 +81,12 @@ func initWorkingDirectory() error {
 }
 
 func validateWebFolder(web string) error {
-	web_dir, err := filepath.Abs(web)
+	wd, err := os.Getwd()
+	if err != nil {
+		return core.NewStdErr(core.ERR_EnvFatal, err.Error())
+	}
+
+	web_dir, err := filepath.Abs(path.Join(wd, web))
 	if err != nil {
 		return core.NewStdErr(core.ERR_EnvFatal, err.Error())
 	}
