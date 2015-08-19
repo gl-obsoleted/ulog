@@ -7,7 +7,7 @@
     <ProjectGuid>{89F36330-2685-4A23-BE90-F37C35590672}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameCommon</RootNamespace>
+    <RootNamespace>ulog</RootNamespace>
     <AssemblyName>ulog</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

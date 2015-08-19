@@ -6,6 +6,32 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+public class LogBuffer
+{
+    public const int KB = 1024;
+    public const int BufSize = 16 * KB;
+
+    public byte[] Buf = new byte[BufSize];
+    public int BufWrittenBytes = 0;
+
+    public bool Receive(string content)
+    {
+        byte[] bytes = Encoding.Default.GetBytes(content);
+        if (BufWrittenBytes + bytes.Length > BufSize)
+            return false;
+
+        Buffer.BlockCopy(bytes, 0, Buf, BufWrittenBytes, bytes.Length);
+        BufWrittenBytes += bytes.Length;
+        return true;
+    }
+
+    public void Clear()
+    {
+        BufWrittenBytes = 0;
+    }
+}
+
+
 public class LogEventArgs : EventArgs
 {
     public LogEventArgs(int seqID, LogType type, string content, float time)
@@ -78,6 +104,8 @@ public class LogService : IDisposable
 
     public void Dispose()
     {
+        FlushLogWriting();
+
         Log.Info("destroying log service...");
 
         if (_logWriter != null)
@@ -90,6 +118,36 @@ public class LogService : IDisposable
 #endif
 
         _disposed = true;
+    }
+
+    public void WriteLog(string content, LogType type)
+    {
+        // write directly if larger than buffer
+        if (Encoding.Default.GetByteCount(content) > LogBuffer.BufSize)
+        {
+            if (_logWriter != null)
+            {
+                _logWriter.Write(content);
+            }
+        }
+
+        // write into buffer 
+        if (type == LogType.Error || !_memBuf.Receive(content))
+        {
+            // flush into file when buffer is full
+            FlushLogWriting();
+
+            _memBuf.Receive(content);
+        }
+    }
+
+    public void FlushLogWriting()
+    {
+        if (_logWriter != null)
+        {
+            _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
+        }
+        _memBuf.Clear();
     }
 
     private void CleanupLogsOlderThan(int days)
@@ -155,10 +213,7 @@ public class LogService : IDisposable
 
         try
         {
-            if (_logWriter != null)
-            {
-                _logWriter.WriteLine("{0:0.00} {1}: {2}", Time.realtimeSinceStartup, type, condition);
-            }
+            WriteLog(string.Format("{0:0.00} {1}: {2}\r\n", Time.realtimeSinceStartup, type, condition), type);
 
             foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
             {
@@ -173,7 +228,7 @@ public class LogService : IDisposable
         }
         catch (System.Exception ex)
         {
-            Log.Exception(ex); // this should at least print to Unity Editor (but skip the file writing due to earlier writing failure)            	
+            Log.Exception(ex); // this should at least print to Unity Editor (but may skip the file writing due to earlier writing failure)            	
         }
 
         _isWriting = false;
@@ -189,6 +244,8 @@ public class LogService : IDisposable
 
     private bool _disposed = false;
     private bool _isWriting = false;
+
+    private LogBuffer _memBuf = new LogBuffer();
 
     public static string LastLogFile { get; set; }
 }
