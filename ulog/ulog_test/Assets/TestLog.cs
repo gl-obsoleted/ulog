@@ -6,13 +6,15 @@ public class TestLog : MonoBehaviour {
 
     public bool LoggingIntoFile = true;
     public bool PrintTestLogs = true;
+    public int DaysKeeping = -1;  // would cleanup if older than 'n' days
 
     private LogService _logServ;
 
 	// Use this for initialization
 	void Start () 
     {
-        _logServ = new LogService(LoggingIntoFile);
+        int days = DaysKeeping == 0 ? 1 : DaysKeeping;
+        _logServ = new LogService(LoggingIntoFile, days);
 
         if (PrintTestLogs)
         {

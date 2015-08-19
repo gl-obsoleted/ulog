@@ -28,7 +28,7 @@ public class LogService : IDisposable
 {
     public event LogTargetHandler LogTargets;
 
-    public LogService(bool logIntoFile)
+    public LogService(bool logIntoFile, int oldLogsKeptDays) // '-1' means keeping all logs without any erasing
     {
         RegisterCallback();
 
@@ -61,6 +61,19 @@ public class LogService : IDisposable
             Log.Info("'Log Into File' disabled.");
             LastLogFile = "";
         }
+
+        if (oldLogsKeptDays > 0)
+        {
+            try
+            {
+                CleanupLogsOlderThan(oldLogsKeptDays);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+                Log.Error("Cleaning up logs ({0}) failed.", oldLogsKeptDays);
+            }
+        }
     }
 
     public void Dispose()
@@ -77,6 +90,31 @@ public class LogService : IDisposable
 #endif
 
         _disposed = true;
+    }
+
+    private void CleanupLogsOlderThan(int days)
+    {
+        DateTime timePointForDeleting = DateTime.Now.Subtract(TimeSpan.FromDays(days));
+        string timeStrForDeleting = SysUtil.FormatDateAsFileNameString(timePointForDeleting);
+
+        DirectoryInfo logDirInfo = new DirectoryInfo(SysUtil.CombinePaths(Application.persistentDataPath, "log"));
+        DirectoryInfo[] dirsByDate = logDirInfo.GetDirectories();
+        List<string> toBeDeleted = new List<string>();
+        foreach (var item in dirsByDate)
+        {
+            //Log.Info("[COMPARING]: {0}, {1}", item.Name, timeStrForDeleting);
+            if (string.CompareOrdinal(item.Name, timeStrForDeleting) <= 0)
+            {
+                toBeDeleted.Add(item.FullName);
+                //Log.Info("[TO_BE_DELETED]: {0}", item.FullName);
+            }
+        }
+
+        foreach (var item in toBeDeleted)
+        {
+            Directory.Delete(item, true);
+            Log.Info("[ Log Cleanup ]: {0}", item);
+        }
     }
 
     private void RegisterCallback()
