@@ -19,7 +19,15 @@ public class TestLog : MonoBehaviour {
         if (PrintTestLogs)
         {
             Log.Info("test log info: {0} {1} {2}", 0, 3.5f, "foo");
+
+            for (int i = 0; i < 30; i++)
+                Log.Info("repeat AAA.");
+
             Log.TODO("test TODO.");
+
+            for (int i = 0; i < 50; i++)
+                Log.Info("repeat BBB.");
+
             Log.Warning("test warning.");
             Log.Error("test error.");
             Log.Assert(false, "test assert");
@@ -38,6 +46,10 @@ public class TestLog : MonoBehaviour {
         Log.DeltaTime("sleep for 0.3s");
         yield return new WaitForSeconds(0.4f);
         Log.DeltaTime("sleep for 0.4s");
+        yield return new WaitForSeconds(0.3f);
+
+        for (int i = 0; i < 100; i++)
+            Log.Info("repeat info.");
     }
 
     // Update is called once per frame

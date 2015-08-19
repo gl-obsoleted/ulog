@@ -143,11 +143,9 @@ public class LogService : IDisposable
 
     public void FlushLogWriting()
     {
-        if (_logWriter != null)
-        {
-            _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
-        }
-        _memBuf.Clear();
+        FlushMemBuffer();   // the first pass FlushMemBuffer() could not be avoided to preserve the order of messages
+        FlushFoldedMessage();
+        FlushMemBuffer();   // the second time flush, for the folded message 
     }
 
     private void CleanupLogsOlderThan(int days)
@@ -213,7 +211,19 @@ public class LogService : IDisposable
 
         try
         {
-            WriteLog(string.Format("{0:0.00} {1}: {2}\r\n", Time.realtimeSinceStartup, type, condition), type);
+            if (condition == _lastWrittenContent)
+            {
+                _foldedCount++;
+            }
+            else 
+            {
+                FlushFoldedMessage();
+
+                WriteLog(string.Format("{0:0.00} {1}: {2}\r\n", Time.realtimeSinceStartup, type, condition), type);
+
+                _lastWrittenContent = condition;
+                _lastWrittenType = type;
+            }
 
             foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
             {
@@ -234,6 +244,24 @@ public class LogService : IDisposable
         _isWriting = false;
     }
 
+    private void FlushMemBuffer()
+    {
+        if (_logWriter != null)
+        {
+            _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
+        }
+        _memBuf.Clear();
+    }
+
+    private void FlushFoldedMessage()
+    {
+        if (_foldedCount > 0)
+        {
+            WriteLog(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount), _lastWrittenType);
+            _foldedCount = 0;
+        }
+    }
+
     private string _logPath;
     private StreamWriter _logWriter;
 
@@ -246,6 +274,9 @@ public class LogService : IDisposable
     private bool _isWriting = false;
 
     private LogBuffer _memBuf = new LogBuffer();
+    private string _lastWrittenContent;
+    private LogType _lastWrittenType;
+    private int _foldedCount = 0;
 
     public static string LastLogFile { get; set; }
 }
