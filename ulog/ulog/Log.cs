@@ -28,6 +28,15 @@ public static class Log
             }
         }
     }
+
+    public static void Info(object msg, UnityEngine.Object context)
+    {
+        if (LogLevel >= LogLevel.Info)
+        {
+            Debug.Log(msg, context);
+        }
+    }
+
     public static void TODO(object msg, params object[] args)
     {
         if (LogLevel >= LogLevel.Info)
