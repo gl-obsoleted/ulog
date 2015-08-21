@@ -29,7 +29,7 @@ public static class Log
         }
     }
 
-    public static void Info(object msg, UnityEngine.Object context)
+    public static void InfoEx(object msg, UnityEngine.Object context)
     {
         if (LogLevel >= LogLevel.Info)
         {
