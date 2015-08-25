@@ -186,7 +186,7 @@ public class LogService : IDisposable
 
     private void OnLogReceived(string condition, string stackTrace, LogType type)
     {
-        if (_disposed || _isWriting)
+        if (_disposed || _isWriting || _reentranceGuard)
             return;
 
         _isWriting = true;
@@ -227,6 +227,8 @@ public class LogService : IDisposable
                 _lastWrittenType = type;
             }
 
+            _reentranceGuard = true;
+
             foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
             {
                 ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
@@ -237,6 +239,8 @@ public class LogService : IDisposable
                 else
                     Caster(this, args);
             }
+
+            _reentranceGuard = false;
         }
         catch (System.Exception ex)
         {
@@ -279,6 +283,8 @@ public class LogService : IDisposable
     private string _lastWrittenContent;
     private LogType _lastWrittenType;
     private int _foldedCount = 0;
+
+    private bool _reentranceGuard = false;
 
     public static string LastLogFile { get; set; }
 }
