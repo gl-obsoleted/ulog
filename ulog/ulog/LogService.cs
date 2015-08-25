@@ -186,10 +186,13 @@ public class LogService : IDisposable
 
     private void OnLogReceived(string condition, string stackTrace, LogType type)
     {
-        if (_disposed || _isWriting || _reentranceGuard)
-            return;
+        if (_disposed)
+            throw new Exception(string.Format("LogService used after being disposed. (content:{0})", condition));
 
-        _isWriting = true;
+        if (_reentranceGuard)
+            throw new Exception(string.Format("LogService Reentrance occurred. (content:{0})", condition));
+
+        _reentranceGuard = true;
 
         ++_seqID;
 
@@ -227,8 +230,6 @@ public class LogService : IDisposable
                 _lastWrittenType = type;
             }
 
-            _reentranceGuard = true;
-
             foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
             {
                 ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
@@ -239,15 +240,15 @@ public class LogService : IDisposable
                 else
                     Caster(this, args);
             }
-
-            _reentranceGuard = false;
         }
         catch (System.Exception ex)
         {
             Log.Exception(ex); // this should at least print to Unity Editor (but may skip the file writing due to earlier writing failure)            	
         }
-
-        _isWriting = false;
+        finally
+        {
+            _reentranceGuard = false;
+        }
     }
 
     private void FlushMemBuffer()
@@ -277,7 +278,6 @@ public class LogService : IDisposable
     private int _exceptionCount = 0;
 
     private bool _disposed = false;
-    private bool _isWriting = false;
 
     private LogBuffer _memBuf = new LogBuffer();
     private string _lastWrittenContent;
