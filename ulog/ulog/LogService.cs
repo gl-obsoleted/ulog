@@ -34,17 +34,19 @@ public class LogBuffer
 
 public class LogEventArgs : EventArgs
 {
-    public LogEventArgs(int seqID, LogType type, string content, float time)
+    public LogEventArgs(int seqID, LogType type, string content, string stacktrace, float time)
     {
         SeqID = seqID;
         LogType = type;
         Content = content;
+        Stacktrace = stacktrace;
         Time = time;
     }
 
     public int SeqID = 0;
     public LogType LogType;
     public string Content = "";
+    public string Stacktrace = "";
     public float Time = 0.0f;
 }
 
@@ -228,7 +230,7 @@ public class LogService : IDisposable
             foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
             {
                 ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
-                LogEventArgs args = new LogEventArgs(_seqID, type, condition, Time.realtimeSinceStartup);
+                LogEventArgs args = new LogEventArgs(_seqID, type, condition, stackTrace, Time.realtimeSinceStartup);
 
                 if (SyncInvoke != null && SyncInvoke.InvokeRequired)
                     SyncInvoke.Invoke(Caster, new object[] { this, args });
