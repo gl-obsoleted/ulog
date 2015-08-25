@@ -28,7 +28,7 @@ public class TestLog : MonoBehaviour {
             for (int i = 0; i < 50; i++)
                 Log.Info("repeat BBB.");
 
-            Log.Info("test context object.", this);
+            Log.InfoEx("test context object.", this);
 
             Log.Warning("test warning.");
             Log.Error("test error.");

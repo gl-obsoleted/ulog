@@ -115,11 +115,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1968480670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5cac9e38d873d4583e8095e188a479, type: 3}
+  m_Script: {fileID: 11500000, guid: 22fa2851b53e37a468abdd8889c32e37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   LoggingIntoFile: 1
-  PrintTestLogs: 0
+  PrintTestLogs: 1
+  DaysKeeping: 1
 --- !u!23 &1968480672
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -183,7 +184,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1968480670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 633fc1f70c9810949857c511000ed3ac, type: 3}
+  m_Script: {fileID: 11500000, guid: f44009b41e2c4f349b624b15e5b9f690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   EnableLogUploading: 1
