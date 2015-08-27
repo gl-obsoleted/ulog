@@ -14,7 +14,7 @@ public class TestLog : MonoBehaviour {
 	void Start () 
     {
         int days = DaysKeeping == 0 ? 1 : DaysKeeping;
-        _logServ = new LogService(LoggingIntoFile, days);
+        _logServ = new LogService(LoggingIntoFile, days, true);
 
         if (PrintTestLogs)
         {

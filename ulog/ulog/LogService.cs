@@ -56,9 +56,11 @@ public class LogService : IDisposable
 {
     public event LogTargetHandler LogTargets;
 
-    public LogService(bool logIntoFile, int oldLogsKeptDays) // '-1' means keeping all logs without any erasing
+    public LogService(bool logIntoFile, int oldLogsKeptDays, bool useMemBuf) // '-1' means keeping all logs without any erasing
     {
         RegisterCallback();
+
+        _useMemBuf = useMemBuf;
 
         if (logIntoFile)
         {
@@ -124,22 +126,35 @@ public class LogService : IDisposable
 
     public void WriteLog(string content, LogType type)
     {
-        // write directly if larger than buffer
-        if (Encoding.Default.GetByteCount(content) > LogBuffer.BufSize)
+        if (_useMemBuf)
+        {
+            // write directly if larger than buffer
+            if (Encoding.Default.GetByteCount(content) > LogBuffer.BufSize)
+            {
+                // flush into file before writing
+                FlushLogWriting();
+
+                if (_logWriter != null)
+                {
+                    _logWriter.Write(content);
+                }
+            }
+
+            // write into buffer 
+            if (type == LogType.Error || !_memBuf.Receive(content))
+            {
+                // flush into file when buffer is full
+                FlushLogWriting();
+
+                _memBuf.Receive(content);
+            }
+        }
+        else
         {
             if (_logWriter != null)
             {
                 _logWriter.Write(content);
             }
-        }
-
-        // write into buffer 
-        if (type == LogType.Error || !_memBuf.Receive(content))
-        {
-            // flush into file when buffer is full
-            FlushLogWriting();
-
-            _memBuf.Receive(content);
         }
     }
 
@@ -253,6 +268,9 @@ public class LogService : IDisposable
 
     private void FlushMemBuffer()
     {
+        if (!_useMemBuf)
+            return;
+
         if (_logWriter != null)
         {
             _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
@@ -279,6 +297,7 @@ public class LogService : IDisposable
 
     private bool _disposed = false;
 
+    private bool _useMemBuf = true;
     private LogBuffer _memBuf = new LogBuffer();
     private string _lastWrittenContent;
     private LogType _lastWrittenType;
