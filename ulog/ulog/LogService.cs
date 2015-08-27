@@ -105,6 +105,11 @@ public class LogService : IDisposable
             }
         }
     }
+    public bool UseMemBuf
+    {
+        get { return _useMemBuf; }
+        set { _useMemBuf = value; FlushLogWriting(); }
+    }
 
     public void Dispose()
     {
