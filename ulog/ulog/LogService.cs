@@ -165,9 +165,7 @@ public class LogService : IDisposable
 
     public void FlushLogWriting()
     {
-        FlushMemBuffer();   // the first pass FlushMemBuffer() could not be avoided to preserve the order of messages
         FlushFoldedMessage();
-        FlushMemBuffer();   // the second time flush, for the folded message 
     }
 
     private void CleanupLogsOlderThan(int days)
@@ -285,9 +283,15 @@ public class LogService : IDisposable
 
     private void FlushFoldedMessage()
     {
+        FlushMemBuffer();
+
         if (_foldedCount > 0)
         {
-            WriteLog(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount), _lastWrittenType);
+            if (_logWriter != null)
+            {
+                _logWriter.Write(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount), _lastWrittenType);
+            }
+
             _foldedCount = 0;
         }
     }
