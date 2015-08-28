@@ -237,7 +237,7 @@ public class LogService : IDisposable
             // 如果是异常的话，加上堆栈信息
             if (type == LogType.Exception)
             {
-                condition = string.Format("{0}\r\n{1}", condition, stackTrace.Replace("\n", "\r\n  "));
+                condition = string.Format("{0}\r\n  {1}", condition, stackTrace.Replace("\n", "\r\n  "));
             }
 
             if (condition == _lastWrittenContent)
