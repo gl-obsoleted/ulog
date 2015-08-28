@@ -33,7 +33,12 @@ public class TestLog : MonoBehaviour {
             Log.Warning("test warning.");
             Log.Error("test error.");
             Log.Assert(false, "test assert");
-            Log.Exception(new Exception());
+
+            Log.Exception(new Exception("foo"));
+            Log.Exception(new Exception("bar"));
+
+            for (int i = 0; i < 30; i++)
+                Log.Exception(new Exception("Oops!"));
 
             StartCoroutine(RunTimedLogging());
         }
