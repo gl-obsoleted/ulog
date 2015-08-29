@@ -40,7 +40,10 @@ public class TestLog : MonoBehaviour {
             Log.Exception(new Exception("bar"));
 
             for (int i = 0; i < 30; i++)
-                Log.Exception(new Exception("Oops!"));
+                Log.Error(new Exception("Oops! Error."));
+
+            for (int i = 0; i < 30; i++)
+                Log.Exception(new Exception("Oops! Exception."));
 
             foreach (var item in LogUtil.InMemoryExceptions)
             {

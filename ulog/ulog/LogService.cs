@@ -162,11 +162,11 @@ public class LogService : IDisposable
 
         if (_useMemBuf)
         {
-            // write directly if larger than buffer
-            if (Encoding.Default.GetByteCount(content) > _memBuf.BufSize)
+            // write directly if it's error or message is larger than buffer
+            if (type == LogType.Error || Encoding.Default.GetByteCount(content) > _memBuf.BufSize)
             {
                 // flush into file before writing
-                FlushLogWriting();
+                FlushMemBuffer();
 
                 if (_logWriter != null)
                 {
@@ -174,11 +174,10 @@ public class LogService : IDisposable
                 }
             }
 
-            // write into buffer 
-            if (type == LogType.Error || !_memBuf.Receive(content))
+            // flush into file when buffer is full
+            if (!_memBuf.Receive(content))
             {
-                // flush into file when buffer is full
-                FlushLogWriting();
+                FlushMemBuffer();
 
                 _memBuf.Receive(content);
             }
@@ -309,7 +308,7 @@ public class LogService : IDisposable
         if (!_useMemBuf)
             return;
 
-        if (_logWriter != null)
+        if (_logWriter != null && _memBuf.BufWrittenBytes > 0)
         {
             _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
         }
@@ -324,7 +323,7 @@ public class LogService : IDisposable
         {
             if (_logWriter != null)
             {
-                _logWriter.Write(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount), _lastWrittenType);
+                _logWriter.Write(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount));
             }
 
             _foldedCount = 0;
