@@ -13,6 +13,8 @@ public class TestLog : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
+        LogService.UserDefinedMemBufSize = 8 * 1024; // setup a 8KB memory buffer
+
         int days = DaysKeeping == 0 ? 1 : DaysKeeping;
         _logServ = new LogService(LoggingIntoFile, days, true);
 

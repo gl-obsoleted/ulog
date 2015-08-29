@@ -9,10 +9,19 @@ using UnityEngine;
 public class LogBuffer
 {
     public const int KB = 1024;
-    public const int BufSize = 16 * KB;
+    public const int InternalBufSize = 16 * KB;
 
-    public byte[] Buf = new byte[BufSize];
+    public byte[] Buf;
+    public int BufSize = InternalBufSize;
     public int BufWrittenBytes = 0;
+
+    public LogBuffer(int userDefinedSize = 0)
+    {
+        if (userDefinedSize != 0)
+            BufSize = userDefinedSize;
+
+        Buf = new byte[BufSize];
+    }
 
     public bool Receive(string content)
     {
@@ -56,11 +65,15 @@ public class LogService : IDisposable
 {
     public event LogTargetHandler LogTargets;
 
+    public static int UserDefinedMemBufSize = 0;
+
     public LogService(bool logIntoFile, int oldLogsKeptDays, bool useMemBuf) // '-1' means keeping all logs without any erasing
     {
         RegisterCallback();
 
         _useMemBuf = useMemBuf;
+
+        _memBuf = new LogBuffer(UserDefinedMemBufSize);
 
         if (logIntoFile)
         {
@@ -150,7 +163,7 @@ public class LogService : IDisposable
         if (_useMemBuf)
         {
             // write directly if larger than buffer
-            if (Encoding.Default.GetByteCount(content) > LogBuffer.BufSize)
+            if (Encoding.Default.GetByteCount(content) > _memBuf.BufSize)
             {
                 // flush into file before writing
                 FlushLogWriting();
@@ -329,7 +342,7 @@ public class LogService : IDisposable
     private bool _disposed = false;
 
     private bool _useMemBuf = true;
-    private LogBuffer _memBuf = new LogBuffer();
+    private LogBuffer _memBuf;
     private string _lastWrittenContent;
     private LogType _lastWrittenType;
     private int _foldedCount = 0;
