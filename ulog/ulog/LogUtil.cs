@@ -29,8 +29,8 @@ public class LogUtil
     public static bool EnableInMemoryStorage = true;
     public static int InMemoryItemMaxCount = 3;
 
-    public static List<string> InMemoryExceptions;
-    public static List<string> InMemoryErrors;
+    public static List<string> InMemoryExceptions = new List<string>();
+    public static List<string> InMemoryErrors = new List<string>();
     public static void PushInMemoryException(string exception)
     {
         InMemoryExceptions.Add(exception);

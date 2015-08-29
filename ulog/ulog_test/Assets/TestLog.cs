@@ -40,6 +40,16 @@ public class TestLog : MonoBehaviour {
             for (int i = 0; i < 30; i++)
                 Log.Exception(new Exception("Oops!"));
 
+            foreach (var item in LogUtil.InMemoryExceptions)
+            {
+                Log.Info("[LogUtil.InMemoryExceptions]: {0}", item);
+            }
+
+            foreach (var item in LogUtil.InMemoryErrors)
+            {
+                Log.Info("[LogUtil.InMemoryErrors]: {0}", item);
+            }
+
             StartCoroutine(RunTimedLogging());
         }
 	}

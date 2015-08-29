@@ -73,7 +73,7 @@ public class LogUpload : MonoBehaviour
 	{
         List<string> logfiles = new List<string>();
 
-        string logDir = SysUtil.CombinePaths(Application.persistentDataPath, "log");
+        string logDir = LogUtil.CombinePaths(Application.persistentDataPath, "log");
         Util.ProcessDirectory(logDir, (path) => { logfiles.Add(path); });
 
         Dictionary<string, string> loginfo = new Dictionary<string, string>();
