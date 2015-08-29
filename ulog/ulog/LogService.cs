@@ -68,10 +68,10 @@ public class LogService : IDisposable
             {
                 DateTime dt = DateTime.Now;
 
-                string logDir = SysUtil.CombinePaths(Application.persistentDataPath, "log", SysUtil.FormatDateAsFileNameString(dt));
+                string logDir = LogUtil.CombinePaths(Application.persistentDataPath, "log", LogUtil.FormatDateAsFileNameString(dt));
                 Directory.CreateDirectory(logDir);
 
-                string logPath = Path.Combine(logDir, SysUtil.FormatDateAsFileNameString(dt) + '_' + SysUtil.FormatTimeAsFileNameString(dt) + ".txt");
+                string logPath = Path.Combine(logDir, LogUtil.FormatDateAsFileNameString(dt) + '_' + LogUtil.FormatTimeAsFileNameString(dt) + ".txt");
 
                 _logWriter = new FileInfo(logPath).CreateText();
                 _logWriter.AutoFlush = true;
@@ -131,6 +131,22 @@ public class LogService : IDisposable
 
     public void WriteLog(string content, LogType type)
     {
+        // save it in memory first
+        if (LogUtil.EnableInMemoryStorage)
+        {
+            switch (type)
+            {
+                case LogType.Error:
+                    LogUtil.PushInMemoryError(content);
+                    break;
+                case LogType.Exception:
+                    LogUtil.PushInMemoryException(content);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (_useMemBuf)
         {
             // write directly if larger than buffer
@@ -171,9 +187,9 @@ public class LogService : IDisposable
     private void CleanupLogsOlderThan(int days)
     {
         DateTime timePointForDeleting = DateTime.Now.Subtract(TimeSpan.FromDays(days));
-        string timeStrForDeleting = SysUtil.FormatDateAsFileNameString(timePointForDeleting);
+        string timeStrForDeleting = LogUtil.FormatDateAsFileNameString(timePointForDeleting);
 
-        DirectoryInfo logDirInfo = new DirectoryInfo(SysUtil.CombinePaths(Application.persistentDataPath, "log"));
+        DirectoryInfo logDirInfo = new DirectoryInfo(LogUtil.CombinePaths(Application.persistentDataPath, "log"));
         DirectoryInfo[] dirsByDate = logDirInfo.GetDirectories();
         List<string> toBeDeleted = new List<string>();
         foreach (var item in dirsByDate)
