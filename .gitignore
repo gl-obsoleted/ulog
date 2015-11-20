@@ -205,3 +205,5 @@ FakesAssemblies/
 /ulog_server/src/gopkg.in/mgo.v2
 *.sublime-workspace
 /ulog_server/ugc
+/ulog/ulog_test/Assets/UnityVS.meta
+/ulog/ulog_test/Assets/UnityVS/Editor.meta
