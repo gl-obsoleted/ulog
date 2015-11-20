@@ -13,8 +13,10 @@ public class TestLog : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
+        LogService.UserDefinedMemBufSize = 8 * 1024; // setup a 8KB memory buffer
+
         int days = DaysKeeping == 0 ? 1 : DaysKeeping;
-        _logServ = new LogService(LoggingIntoFile, days);
+        _logServ = new LogService(LoggingIntoFile, days, true);
 
         if (PrintTestLogs)
         {
@@ -43,7 +45,25 @@ public class TestLog : MonoBehaviour {
             Log.Warning("test warning.");
             Log.Error("test error.");
             Log.Assert(false, "test assert");
-            Log.Exception(new Exception());
+
+            Log.Exception(new Exception("foo"));
+            Log.Exception(new Exception("bar"));
+
+            for (int i = 0; i < 30; i++)
+                Log.Error(new Exception("Oops! Error."));
+
+            for (int i = 0; i < 30; i++)
+                Log.Exception(new Exception("Oops! Exception."));
+
+            foreach (var item in LogUtil.InMemoryExceptions)
+            {
+                Log.Info("[LogUtil.InMemoryExceptions]: {0}", item);
+            }
+
+            foreach (var item in LogUtil.InMemoryErrors)
+            {
+                Log.Info("[LogUtil.InMemoryErrors]: {0}", item);
+            }
 
             StartCoroutine(RunTimedLogging());
         }
