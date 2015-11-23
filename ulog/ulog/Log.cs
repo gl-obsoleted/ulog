@@ -55,14 +55,17 @@ public static class Log
         {
             object formatted = _format(string.Format("Trace: {0}", msg), args);
 
-#if UNITY_EDITOR
-            Debug.Log(formatted);
-#else
-            if (TraceReceiver != null && formatted != null)
+            if (Application.isEditor)
             {
-                TraceReceiver(formatted.ToString());
+                Debug.Log(formatted);
             }
-#endif
+            else
+            {
+                if (TraceReceiver != null && formatted != null)
+                {
+                    TraceReceiver(formatted.ToString());
+                }
+            }
         }
     }
     public static void Error(object msg, params object[] args)

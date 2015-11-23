@@ -233,7 +233,7 @@ public class LogService : IDisposable
 
     private void WriteTrace(string content)
     {
-        OnLogReceived(content, "", LogType.Error);
+        OnLogReceived(content, "", LogType.Log);
     }
 
     private void OnLogReceived(string condition, string stackTrace, LogType type)
