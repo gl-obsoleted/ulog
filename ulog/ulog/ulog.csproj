@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Log.cs" />
     <Compile Include="LogService.cs" />
+    <Compile Include="LogUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

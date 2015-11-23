@@ -56,7 +56,7 @@ public static class Log
             object formatted = _format(string.Format("Trace: {0}", msg), args);
 
 #if UNITY_EDITOR
-            Debug.LogError(formatted);
+            Debug.Log(formatted);
 #else
             if (TraceReceiver != null && formatted != null)
             {
