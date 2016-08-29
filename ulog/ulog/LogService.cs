@@ -9,10 +9,19 @@ using UnityEngine;
 public class LogBuffer
 {
     public const int KB = 1024;
-    public const int BufSize = 16 * KB;
+    public const int InternalBufSize = 16 * KB;
 
-    public byte[] Buf = new byte[BufSize];
+    public byte[] Buf;
+    public int BufSize = InternalBufSize;
     public int BufWrittenBytes = 0;
+
+    public LogBuffer(int userDefinedSize = 0)
+    {
+        if (userDefinedSize != 0)
+            BufSize = userDefinedSize;
+
+        Buf = new byte[BufSize];
+    }
 
     public bool Receive(string content)
     {
@@ -56,11 +65,15 @@ public class LogService : IDisposable
 {
     public event LogTargetHandler LogTargets;
 
+    public static int UserDefinedMemBufSize = 0;
+
     public LogService(bool logIntoFile, int oldLogsKeptDays, bool useMemBuf) // '-1' means keeping all logs without any erasing
     {
         RegisterCallback();
 
         _useMemBuf = useMemBuf;
+
+        _memBuf = new LogBuffer(UserDefinedMemBufSize);
 
         if (logIntoFile)
         {
@@ -68,10 +81,10 @@ public class LogService : IDisposable
             {
                 DateTime dt = DateTime.Now;
 
-                string logDir = SysUtil.CombinePaths(Application.persistentDataPath, "log", SysUtil.FormatDateAsFileNameString(dt));
+                string logDir = LogUtil.CombinePaths(Application.persistentDataPath, "log", LogUtil.FormatDateAsFileNameString(dt));
                 Directory.CreateDirectory(logDir);
 
-                string logPath = Path.Combine(logDir, SysUtil.FormatDateAsFileNameString(dt) + '_' + SysUtil.FormatTimeAsFileNameString(dt) + ".txt");
+                string logPath = Path.Combine(logDir, LogUtil.FormatDateAsFileNameString(dt) + '_' + LogUtil.FormatTimeAsFileNameString(dt) + ".txt");
 
                 _logWriter = new FileInfo(logPath).CreateText();
                 _logWriter.AutoFlush = true;
@@ -131,13 +144,29 @@ public class LogService : IDisposable
 
     public void WriteLog(string content, LogType type)
     {
+        // save it in memory first
+        if (LogUtil.EnableInMemoryStorage)
+        {
+            switch (type)
+            {
+                case LogType.Error:
+                    LogUtil.PushInMemoryError(content);
+                    break;
+                case LogType.Exception:
+                    LogUtil.PushInMemoryException(content);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (_useMemBuf)
         {
-            // write directly if larger than buffer
-            if (Encoding.Default.GetByteCount(content) > LogBuffer.BufSize)
+            // write directly if it's error or message is larger than buffer
+            if (type == LogType.Error || Encoding.Default.GetByteCount(content) > _memBuf.BufSize)
             {
                 // flush into file before writing
-                FlushLogWriting();
+                FlushMemBuffer();
 
                 if (_logWriter != null)
                 {
@@ -145,11 +174,10 @@ public class LogService : IDisposable
                 }
             }
 
-            // write into buffer 
-            if (type == LogType.Error || !_memBuf.Receive(content))
+            // flush into file when buffer is full
+            if (!_memBuf.Receive(content))
             {
-                // flush into file when buffer is full
-                FlushLogWriting();
+                FlushMemBuffer();
 
                 _memBuf.Receive(content);
             }
@@ -171,9 +199,9 @@ public class LogService : IDisposable
     private void CleanupLogsOlderThan(int days)
     {
         DateTime timePointForDeleting = DateTime.Now.Subtract(TimeSpan.FromDays(days));
-        string timeStrForDeleting = SysUtil.FormatDateAsFileNameString(timePointForDeleting);
+        string timeStrForDeleting = LogUtil.FormatDateAsFileNameString(timePointForDeleting);
 
-        DirectoryInfo logDirInfo = new DirectoryInfo(SysUtil.CombinePaths(Application.persistentDataPath, "log"));
+        DirectoryInfo logDirInfo = new DirectoryInfo(LogUtil.CombinePaths(Application.persistentDataPath, "log"));
         DirectoryInfo[] dirsByDate = logDirInfo.GetDirectories();
         List<string> toBeDeleted = new List<string>();
         foreach (var item in dirsByDate)
@@ -199,7 +227,13 @@ public class LogService : IDisposable
         Application.logMessageReceivedThreaded += OnLogReceived;
 #else
         Application.RegisterLogCallbackThreaded(OnLogReceived);
+        Log.TraceReceiver = this.WriteTrace;
 #endif
+    }
+
+    private void WriteTrace(string content)
+    {
+        OnLogReceived(content, "", LogType.Log);
     }
 
     private void OnLogReceived(string condition, string stackTrace, LogType type)
@@ -234,6 +268,12 @@ public class LogService : IDisposable
 
         try
         {
+            // 如果是异常的话，加上堆栈信息
+            if (type == LogType.Exception)
+            {
+                condition = string.Format("{0}\r\n  {1}", condition, stackTrace.Replace("\n", "\r\n  "));
+            }
+
             if (condition == _lastWrittenContent)
             {
                 _foldedCount++;
@@ -248,15 +288,18 @@ public class LogService : IDisposable
                 _lastWrittenType = type;
             }
 
-            foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
+            if (LogTargets != null)
             {
-                ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
-                LogEventArgs args = new LogEventArgs(_seqID, type, condition, stackTrace, Time.realtimeSinceStartup);
+                foreach (LogTargetHandler Caster in LogTargets.GetInvocationList())
+                {
+                    ISynchronizeInvoke SyncInvoke = Caster.Target as ISynchronizeInvoke;
+                    LogEventArgs args = new LogEventArgs(_seqID, type, condition, stackTrace, Time.realtimeSinceStartup);
 
-                if (SyncInvoke != null && SyncInvoke.InvokeRequired)
-                    SyncInvoke.Invoke(Caster, new object[] { this, args });
-                else
-                    Caster(this, args);
+                    if (SyncInvoke != null && SyncInvoke.InvokeRequired)
+                        SyncInvoke.Invoke(Caster, new object[] { this, args });
+                    else
+                        Caster(this, args);
+                }
             }
         }
         catch (System.Exception ex)
@@ -274,7 +317,7 @@ public class LogService : IDisposable
         if (!_useMemBuf)
             return;
 
-        if (_logWriter != null)
+        if (_logWriter != null && _memBuf.BufWrittenBytes > 0)
         {
             _logWriter.Write(Encoding.Default.GetString(_memBuf.Buf, 0, _memBuf.BufWrittenBytes));
         }
@@ -289,7 +332,7 @@ public class LogService : IDisposable
         {
             if (_logWriter != null)
             {
-                _logWriter.Write(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount), _lastWrittenType);
+                _logWriter.Write(string.Format("{0:0.00} {1}: --<< folded {2} messages >>--\r\n", Time.realtimeSinceStartup, _lastWrittenType, _foldedCount));
             }
 
             _foldedCount = 0;
@@ -307,7 +350,7 @@ public class LogService : IDisposable
     private bool _disposed = false;
 
     private bool _useMemBuf = true;
-    private LogBuffer _memBuf = new LogBuffer();
+    private LogBuffer _memBuf;
     private string _lastWrittenContent;
     private LogType _lastWrittenType;
     private int _foldedCount = 0;

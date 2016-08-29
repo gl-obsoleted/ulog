@@ -5,27 +5,25 @@ public enum LogLevel
 {
     NoLog,
     Error,
+    Trace,
     Warning,
     Info,
 }
+
+public delegate void LogTraceReceiver(string content);
+
 
 public static class Log
 {
     public static LogLevel LogLevel = LogLevel.Info;
 
+    public static LogTraceReceiver TraceReceiver;
+
     public static void Info(object msg, params object[] args)
     {
         if (LogLevel >= LogLevel.Info)
         {
-            string fmt = msg as string;
-            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
-            {
-                Debug.Log(msg);
-            }
-            else
-            {
-                Debug.Log(string.Format(fmt, args));
-            }
+            Debug.Log(_format(msg, args));
         }
     }
 
@@ -41,30 +39,32 @@ public static class Log
     {
         if (LogLevel >= LogLevel.Info)
         {
-            string fmt = msg as string;
-            msg = string.Format("TODO:{0}", msg);
-            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
-            {
-                Debug.Log(msg);
-            }
-            else
-            {
-                Debug.Log(string.Format(fmt, args));
-            }
+            Debug.Log(_format(string.Format("TODO:{0}", msg), args));
         }
     }
     public static void Warning(object msg, params object[] args)
     {
         if (LogLevel >= LogLevel.Warning)
         {
-            string fmt = msg as string;
-            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+            Debug.LogWarning(_format(msg, args));
+        }
+    }
+    public static void Trace(object msg, params object[] args)
+    {
+        if (LogLevel >= LogLevel.Trace)
+        {
+            object formatted = _format(string.Format("Trace: {0}", msg), args);
+
+            if (Application.isEditor)
             {
-                Debug.LogWarning(msg);
+                Debug.Log(formatted);
             }
             else
             {
-                Debug.LogWarning(string.Format(fmt, args));
+                if (TraceReceiver != null && formatted != null)
+                {
+                    TraceReceiver(formatted.ToString());
+                }
             }
         }
     }
@@ -72,15 +72,7 @@ public static class Log
     {
         if (LogLevel >= LogLevel.Error)
         {
-            string fmt = msg as string;
-            if (args.Length == 0 || string.IsNullOrEmpty(fmt))
-            {
-                Debug.LogError(msg);
-            }
-            else
-            {
-                Debug.LogError(string.Format(fmt, args));
-            }
+            Debug.LogError(_format(msg, args));
         }
     }
     public static void Exception(Exception ex)
@@ -115,6 +107,19 @@ public static class Log
 
             if (pauseOnFail)
                 Debug.Break();
+        }
+    }
+
+    private static object _format(object msg, params object[] args)
+    {
+        string fmt = msg as string;
+        if (args.Length == 0 || string.IsNullOrEmpty(fmt))
+        {
+            return msg;
+        }
+        else
+        {
+            return string.Format(fmt, args);
         }
     }
 
