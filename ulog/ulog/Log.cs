@@ -101,7 +101,7 @@ public static class Log
 
     public static void Assert(bool condition, string assertString)
     {
-        if (LogLevel <= LogLevel.Error)
+        if (LogLevel >= LogLevel.Error)
         {
             Assert(condition, assertString, false);
         }
@@ -109,7 +109,7 @@ public static class Log
 
     public static void Assert(bool condition, string assertString, bool pauseOnFail)
     {
-        if (!condition && LogLevel <= LogLevel.Error)
+        if (!condition && LogLevel >= LogLevel.Error)
         {
             Debug.LogError("assert failed! " + assertString);
 
