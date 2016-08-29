@@ -54,18 +54,7 @@ public static class Log
         if (LogLevel >= LogLevel.Trace)
         {
             object formatted = _format(string.Format("Trace: {0}", msg), args);
-
-            if (Application.isEditor)
-            {
-                Debug.Log(formatted);
-            }
-            else
-            {
-                if (TraceReceiver != null && formatted != null)
-                {
-                    TraceReceiver(formatted.ToString());
-                }
-            }
+            Debug.Log(formatted);
         }
     }
     public static void Error(object msg, params object[] args)

@@ -223,7 +223,7 @@ public class LogService : IDisposable
 
     private void RegisterCallback()
     {
-#if UNITY_5_0
+#if UNITY_5
         Application.logMessageReceivedThreaded += OnLogReceived;
 #else
         Application.RegisterLogCallbackThreaded(OnLogReceived);
