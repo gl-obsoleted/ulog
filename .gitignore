@@ -207,3 +207,4 @@ FakesAssemblies/
 /ulog_server/ugc
 /ulog/ulog_test/Assets/UnityVS.meta
 /ulog/ulog_test/Assets/UnityVS/Editor.meta
+/ulog/ulog_test/*.csproj

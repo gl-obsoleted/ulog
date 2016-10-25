@@ -12,7 +12,6 @@ public enum LogLevel
 
 public delegate void LogTraceReceiver(string content);
 
-
 public static class Log
 {
     public static LogLevel LogLevel = LogLevel.Info;
