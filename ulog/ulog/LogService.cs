@@ -173,10 +173,9 @@ public class LogService : IDisposable
                     _logWriter.Write(content);
                 }
             }
-
-            // flush into file when buffer is full
-            if (!_memBuf.Receive(content))
+            else if (!_memBuf.Receive(content))
             {
+                // flush into file when buffer is full
                 FlushMemBuffer();
 
                 _memBuf.Receive(content);
