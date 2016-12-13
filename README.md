@@ -1,37 +1,13 @@
 # ulog
 
-## build steps
+This repo is **no longer maintained**, its main value has been merged into other works of mine. 
 
-1. Install environments below
-  - Go (1.4 at least)
-  - Sublime 3
-  - Sublime Package Control
-  - GoSublime (inside Package Control)
+- The logging facilities it provided for Unity projects has been merged into [PerfAssist/**PA_Common**](https://github.com/PerfAssist/PA_Common) 
+- A live working Unity demo project about "1) how to use the logging library 2) how to upload logging files" is provided as [one of PerfAssist Demos (**PADemo_Logging**)](https://github.com/PerfAssist/PADemo_Logging)
+- The logging server (which accepts the uploaded logging files) has been merged into mc_server (which is currently privately maintained [2016-12-13]). 
 
-2. Setup GOPATH
-  - Open `GoSubline.subline-settings` (from menu __Package Settings | GoSublime | Settings - User__) 
-  - Use the sample below and __change the actual GOPATH to your local path__  
-  
-    ``` json
-    {
-    "env": { "GOPATH": "D:/<local_ulog_dir>/ulog_server/" },    
-    }
-    ```
+Let me know if you have any further questions about it. 
 
-3. Build Go server 
-  - open `/ulog_server/src/ulog_sv/main.go` 
-  - Select `Tools | Build Systems | GoSublime`
-  - run `Ctrl - B` to open the build console
-  - run `go get gopkg.in/mgo.v2`
-  - run `go install`
-
-4. Build Go test client
-  - open `ulog_server/src/ulog_test/main.go`
-  - run `go install`
-  
-5. Run the program
-  - run server db `ulog_server_db/run_mongo_test_db.bat`
-  - run server exe `ulog_server/bin/ulog_sv.exe`
-  - run test client `ulog_server/bin/ulog_test.exe`
+Gu Lu
 
 
